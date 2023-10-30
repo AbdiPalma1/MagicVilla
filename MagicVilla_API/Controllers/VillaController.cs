@@ -37,8 +37,8 @@ namespace MagicVilla_API.Controllers
             return Ok(resp);
         }
 
-        [HttpPost]
-        //[HttpPost("CreateVilla")]
+        //[HttpPost]
+        [HttpPost("CreateVilla")]
         //[Route("CreateVilla")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -70,6 +70,24 @@ namespace MagicVilla_API.Controllers
 
             //Retorna una ruta
             return CreatedAtRoute("GetOneVilla", new {id = req.Id}, req);
+        }
+
+        [HttpPut("updateVilla/{id:int}")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult updateVilla(int id, [FromBody] VillaDto modelDatos)
+        {
+            if (modelDatos == null || id != modelDatos.Id)
+            {
+                return BadRequest();
+            }
+            var villa = VillaStore.villaList.FirstOrDefault(v => v.Id == id);
+            villa.Nombre = modelDatos.Nombre;
+            villa.Ocupantes = modelDatos.Ocupantes;
+            villa.MetrosCuadrados = modelDatos.MetrosCuadrados;
+
+            return NoContent();
         }
 
         [HttpDelete("deleteVilla")]
