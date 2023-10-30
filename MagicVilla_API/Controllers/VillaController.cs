@@ -11,17 +11,18 @@ namespace MagicVilla_API.Controllers
     public class VillaController : ControllerBase
     {
         [HttpGet]
+        [Route("getAllVillas")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<VillaDto>> GetVillas()
         {
             return Ok(VillaStore.villaList);    
         }
 
-        [HttpGet("id:int", Name= "GetVilla")]
+        [HttpGet("GetOneVilla/{id:int}", Name = "GetOneVilla")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<VillaDto> GetVilla(int id)
+        public ActionResult<VillaDto> GetOneVilla(int id)
         {
             if (id == 0)
             {
@@ -36,7 +37,9 @@ namespace MagicVilla_API.Controllers
             return Ok(resp);
         }
 
-        [HttpPost ]
+        [HttpPost]
+        //[HttpPost("CreateVilla")]
+        //[Route("CreateVilla")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -66,7 +69,28 @@ namespace MagicVilla_API.Controllers
             VillaStore.villaList.Add(req);
 
             //Retorna una ruta
-            return CreatedAtRoute("GetVilla", new {id = req.Id}, req);
+            return CreatedAtRoute("GetOneVilla", new {id = req.Id}, req);
+        }
+
+        [HttpDelete("deleteVilla")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult DeleteVilla(int id)
+        {
+            if (id == 0)
+            {
+                return BadRequest();
+            }
+
+            var villa = VillaStore.villaList.FirstOrDefault(v => v.Id == id);
+            if (villa == null)
+            {
+                ModelState.AddModelError("Id no encontrado", "No ha habido ninguna correspondecia de id");
+                return NotFound();
+            }
+            VillaStore.villaList.Remove(villa);
+            return NoContent();
         }
     
     
